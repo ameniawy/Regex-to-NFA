@@ -11,7 +11,7 @@
 #     transitions: [
 #         {
 #             arc_from: s1,
-#             arc_to: s2,
+#             arc_to: [s2, s4],
 #             arc_condition: 'a'
 #         }
 #     ]
@@ -26,6 +26,22 @@ class NFA:
 
     def set_initial_state(self, initial_state):
         raise NotImplementedError
+
+    def add_transition(self, arc_from, arc_to, arc_condition):
+        similar = [(index, transition) for (index, transition) in enumerate(self.transitions) if transition.arc_from == arc_from and transition.arc_condition == arc_condition]
+
+        # based on the implementation length will always be either 1 or 0
+        if len(similar) == 0:
+            transition = dict()
+            transition['arc_from'] = arc_from
+            transition['arc_to'] = [arc_to]
+            transition['arc_condition'] = arc_condition
+            return
+
+        # if transition from same state with same condition exists
+        self.transitions[similar[0][0]].arc_to.append(arc_to)
+
+
 
 state_index = 0
 
@@ -55,14 +71,16 @@ def kleene(nfa_1):
     """
     # 1 connect old final states with old initial state using epsilon transition
     for final_state in nfa_1.final_states:
-        transition = _create_transition(final_state, nfa_1.initial_state, 'eps')
-        nfa_1.transitions.append(transition)
+        # transition = _create_transition(final_state, nfa_1.initial_state, 'eps')
+        # nfa_1.transitions.append(transition)
+        nfa_1.add_transition(final_state, nfa_1.initial_state, ' ')
 
     # 2 create a new initial state and connect it to the old initial state with an epsilon transition, old initial state is now a normal state
     new_initial_state = _create_state()
     nfa_1.states.append(new_initial_state)
-    transition = _create_transition(new_initial_state, nfa_1.initial_state, 'eps')
-    nfa_1.transitions.append(transition)
+    # transition = _create_transition(new_initial_state, nfa_1.initial_state, 'eps')
+    # nfa_1.transitions.append(transition)
+    nfa_1.add_transition(new_initial_state, nfa_1.initial_state, ' ')
     nfa_1.initial_state = new_initial_state
 
     # 3 create a new acceptance state
@@ -70,14 +88,17 @@ def kleene(nfa_1):
     new_final_state = _create_state()
     nfa_1.states.append(new_final_state)
     for final_state in nfa_1.final_states:
-        transition = _create_transition(final_state, new_final_state, 'eps')
-        nfa_1.transitions.append(transition)
+        # transition = _create_transition(final_state, new_final_state, 'eps')
+        # nfa_1.transitions.append(transition)
+        nfa_1.add_transition(final_state, new_final_state, ' ')
+        
     
     nfa_1.final_states = [new_final_state]
 
     # 5 connect new start state to new acceptance state using epsilon transition
-    transition = _create_transition(new_initial_state, new_final_state, 'eps')
-    nfa_1.transitions.append(transition)
+    # transition = _create_transition(new_initial_state, new_final_state, 'eps')
+    # nfa_1.transitions.append(transition)
+    nfa_1.add_transition(new_initial_state, new_final_state, ' ')
 
     # 6 return updated NFA after applying kleene star
     return nfa_1
@@ -102,21 +123,26 @@ def union(nfa_1, nfa_2):
     # initial states of both NFAs and set it as initial state for new NFA
     new_initial_state = _create_state()
 
-    transition_1 = _create_transition(new_initial_state, nfa_1.initial_state, 'eps')
-    transition_2 = _create_transition(new_initial_state, nfa_2.initial_state, 'eps')
-    new_nfa.transitions.append(transition_1)
-    new_nfa.transitions.append(transition_2)
+    # transition_1 = _create_transition(new_initial_state, nfa_1.initial_state, 'eps')
+    # transition_2 = _create_transition(new_initial_state, nfa_2.initial_state, 'eps')
+    # new_nfa.transitions.append(transition_1)
+    # new_nfa.transitions.append(transition_2)
+    new_nfa.add_transition(new_initial_state, nfa_1.initial_state, ' ')
+    new_nfa.add_transition(new_initial_state, nfa_2.initial_state, ' ')
+
     new_nfa.initial_state = new_initial_state
 
     # 3 create a new final state and create epsilon transitions from old final states to new final state
     new_final_state = _create_state()
     for final_state in nfa_1.final_states:
-        transition_1 = _create_transition(final_state, new_final_state, 'eps')
-        new_nfa.transitions.append(transition_1)
+        # transition_1 = _create_transition(final_state, new_final_state, 'eps')
+        # new_nfa.transitions.append(transition_1)
+        new_nfa.add_transition(final_state, new_final_state, ' ')
 
     for final_state in nfa_2.final_states:
-        transition_1 = _create_transition(final_state, new_final_state, 'eps')
-        new_nfa.transitions.append(transition_1)
+        # transition_1 = _create_transition(final_state, new_final_state, 'eps')
+        # new_nfa.transitions.append(transition_1)
+        new_nfa.add_transition(final_state, new_final_state, ' ')
 
     # 4 return new NFA
     return new_nfa
