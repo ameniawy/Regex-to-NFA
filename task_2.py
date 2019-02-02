@@ -28,7 +28,7 @@ class NFA:
         raise NotImplementedError
 
     def add_transition(self, arc_from, arc_to, arc_condition):
-        similar = [(index, transition) for (index, transition) in enumerate(self.transitions) if transition.arc_from == arc_from and transition.arc_condition == arc_condition]
+        similar = [(index, transition) for (index, transition) in enumerate(self.transitions) if transition['arc_from'] == arc_from and transition['arc_condition'] == arc_condition]
 
         # based on the implementation length will always be either 1 or 0
         if len(similar) == 0:
@@ -36,10 +36,25 @@ class NFA:
             transition['arc_from'] = arc_from
             transition['arc_to'] = [arc_to]
             transition['arc_condition'] = arc_condition
+            self.transitions.append(transition)
             return
 
         # if transition from same state with same condition exists
-        self.transitions[similar[0][0]].arc_to.append(arc_to)
+        self.transitions[similar[0][0]]['arc_to'].append(arc_to)
+
+    def display(self):
+        # print states
+        print(','.join([str(state) for state in self.states]))
+
+        # print alphabet NOT IMPLEMENTED YET
+
+        # print start state
+        print(self.initial_state)
+        # print final state(s)
+        print(','.join([str(state) for state in self.final_states]))
+        # print transitions
+        print(','.join(['(' + str(transition['arc_from']) + ',' + str(transition['arc_condition']) + ',[' + ','.join([str(to) for to in transition['arc_to']]) + '])' for transition in self.transitions]))
+        # return
 
 
 
@@ -147,6 +162,36 @@ def union(nfa_1, nfa_2):
     # 4 return new NFA
     return new_nfa
 
+def concat(nfa_1, nfa_2):
+    # 1 create an epsilon transition between the fina state(s) of nfa_1 to the initial_state of nfa_2
+    # 2 final state of nfa_2 is the final state of the concat res
+    return
 
+
+if __name__ == '__main__':
+    transitions = [
+        {
+            'arc_from': '1',
+            'arc_to': ['2'],
+            'arc_condition': 'a'
+        }
+        # {
+        #     'arc_from': '2',
+        #     'arc_to': ['2' ,'3'],
+        #     'arc_condition': 'b'
+        # }
+    ]
+    states = ['1', '2']
+    final_states = ['2']
+    initial_state = '1'
+
+    new_nfa = NFA(initial_state, final_states, states, transitions)
+    new_nfa.display()
+
+    state_index = 3
+
+    nfa_star = kleene(new_nfa)
+    nfa_star.display()
+    new_nfa.display()
 
 
