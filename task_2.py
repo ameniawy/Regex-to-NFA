@@ -1,12 +1,7 @@
 
-
 from InfixToPostfix import Conversion
 import argparse
 
-# initial state
-# final states
-# states
-# transitions
 # {
 #     initial_state: s0,
 #     final_states: [s1, s3],
@@ -56,25 +51,16 @@ class NFA:
 
     def display(self):
         # print states
-        # print(','.join([str(state) for state in self.states]))
-
         res = ','.join([str(state) for state in self.states]) + '\n'
-
         # print alphabet
-        # print(','.join(self.get_alphabet()))
         res = res + ','.join(self.get_alphabet()) + '\n'
         # print start state
-        # print(self.initial_state)
         res = res + str(self.initial_state) + '\n'
         # print final state(s)
-        # print(','.join([str(state) for state in self.final_states]))
         res = res + ','.join([str(state) for state in self.final_states]) + '\n'
         # print transitions
-        # print(', '.join(['(' + str(transition['arc_from']) + ',' + str(transition['arc_condition']) + ',[' + ','.join([str(to) for to in transition['arc_to']]) + '])' for transition in self.transitions]))
         res = res + ', '.join(['(' + str(transition['arc_from']) + ',' + str(transition['arc_condition']) + ',[' + ','.join([str(to) for to in transition['arc_to']]) + '])' for transition in self.transitions])
         return res
-
-
 
 state_index = 0
 
@@ -83,7 +69,6 @@ def _create_state():
     new_state = state_index
     state_index += 1
     return new_state
-
 
 def zero_or_more(nfa_1):
     """ Applies the kleene star operation on the input NFA and returns it.
@@ -121,8 +106,6 @@ def zero_or_more(nfa_1):
     # 6 return updated NFA after applying kleene star
     return nfa_1
 
-
-
 def union(nfa_1, nfa_2):
     """ Creates a new NFA and applies union on input NFAs then return the new NFA.
 
@@ -156,7 +139,6 @@ def union(nfa_1, nfa_2):
 
     # 4 return new NFA
     return new_nfa
-
 
 def concat(nfa_1, nfa_2):
     """ Creates a new NFA and applies concat on input NFAs then return the new NFA.
@@ -209,9 +191,6 @@ def copy_NFA(nfa_1):
 
     return new_nfa
 
-
-    
-
 def one_or_more(nfa_1):
     """ Returns the concat of nfa_1 and zero_or_more(nfa_!).
 
@@ -224,7 +203,6 @@ def one_or_more(nfa_1):
     """
     copied_nfa_1 = copy_NFA(nfa_1)
     return concat(nfa_1, zero_or_more(copied_nfa_1))
-
 
 def zero_or_one(nfa_1):
     """ Applies the zero or one operation on the input NFA and returns it.
@@ -261,8 +239,6 @@ def zero_or_one(nfa_1):
 
     # 6 return updated NFA after applying kleene star
     return nfa_1
-
-
 
 def create_NFA_from_symbol(symbol):
     initial_state = _create_state()
@@ -320,9 +296,6 @@ def regex_preprocess(regex):
             res += char
     return res
 
-
-
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(add_help=True, description='Sample Commandline')
 
@@ -330,47 +303,9 @@ if __name__ == '__main__':
                         metavar="regex")
 
     args = parser.parse_args()
-    # transitions = [
-    #     {
-    #         'arc_from': '1',
-    #         'arc_to': ['2'],
-    #         'arc_condition': 'a'
-    #     }
-    #     # {
-    #     #     'arc_from': '2',
-    #     #     'arc_to': ['2' ,'3'],
-    #     #     'arc_condition': 'b'
-    #     # }
-    # ]
-    # states = ['1', '2']
-    # final_states = ['2']
-    # initial_state = '1'
 
-    # new_nfa = NFA(initial_state, final_states, states, transitions)
-    # new_nfa.display()
-
-    # state_index = 3
-
-    # nfa_star = zero_or_more(new_nfa)
-    # nfa_star.display()
-    # new_nfa.display()
-
-    # postfix_string = 'ab.+c.' # (ab)+c
-
-    # nfa = create_NFA_from_symbol('a')
-    # nfa.display()
-
-    # print("\n\n\n\n")
-
-
-    # nfa_kleene = one_or_more(nfa)
-    # nfa_kleene.display()
-
-    # print(args.regex)
-    # print(regex_infix_to_postfix(args.regex))
     res_nfa = regex_postix_to_NFA(regex_infix_to_postfix(args.regex))
     print(res_nfa.display())
 
     output_file = open("task_2_result.txt", "w+")
     output_file.write(res_nfa.display())
-
