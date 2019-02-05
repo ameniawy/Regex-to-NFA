@@ -23,9 +23,6 @@ class NFA:
         self.transitions = transitions
         self.alphabets = []
 
-    def set_initial_state(self, initial_state):
-        raise NotImplementedError
-
     def add_transition(self, arc_from, arc_to, arc_condition):
         similar = [(index, transition) for (index, transition) in enumerate(self.transitions) if transition['arc_from'] == arc_from and transition['arc_condition'] == arc_condition]
 
@@ -151,14 +148,25 @@ def concat(nfa_1, nfa_2):
         new_nfa (NFA): The new NFA after applying the concat operation.
 
     """
-    # 1 create an epsilon transition between the final state(s) of nfa_1 to the initial_state of nfa_2
-    new_nfa = NFA(0,[], nfa_1.states + nfa_2.states, nfa_1.transitions + nfa_2.transitions)
+    removed_state = nfa_1.final_states[0]
+    nfa_1.states.remove(removed_state)
 
-    for final_state in nfa_1.final_states:
-        new_nfa.add_transition(final_state, nfa_2.initial_state, ' ')
+    for (idx1, transition) in enumerate(nfa_1.transitions):
+        if transition['arc_from'] == removed_state:
+            nfa_1.transitions[idx1]['arc_from'] = nfa_2.initial_state
+        for (idx2, arc_to) in enumerate(transition['arc_to']):
+            if arc_to == removed_state:
+                nfa_1.transitions[idx1]['arc_to'][idx2] = nfa_2.initial_state
+
+
+    # 1 create an epsilon transition between the final state(s) of nfa_1 to the initial_state of nfa_2
+    new_nfa = NFA(nfa_1.initial_state ,nfa_2.final_states, nfa_1.states + nfa_2.states, nfa_1.transitions + nfa_2.transitions)
+
+    # for final_state in nfa_1.final_states:
+    #     new_nfa.add_transition(final_state, nfa_2.initial_state, ' ')
 
     # 2 final state of nfa_2 is the final state of the concat res
-    new_nfa.final_states = nfa_2.final_states
+    # new_nfa.final_states = nfa_2.final_states
         
     return new_nfa
 
@@ -299,13 +307,15 @@ def regex_preprocess(regex):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(add_help=True, description='Sample Commandline')
 
-    parser.add_argument('--regex', action="store", help="regex to be transformed into NFA", nargs="?",
-                        metavar="regex")
+    parser.add_argument('--file', action="store", help="path of file to take as input", nargs="?",
+                        metavar="file")
 
     args = parser.parse_args()
 
-    res_nfa = regex_postix_to_NFA(regex_infix_to_postfix(args.regex))
-    print(res_nfa.display())
+    with open(args.file, "r") as file:
+        for regex in file:
+            res_nfa = regex_postix_to_NFA(regex_infix_to_postfix(regex))
+            print(res_nfa.display())
 
-    output_file = open("task_2_result.txt", "w+")
-    output_file.write(res_nfa.display())
+            output_file = open("task_2_result.txt", "w+")
+            output_file.write(res_nfa.display())

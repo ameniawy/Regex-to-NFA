@@ -445,6 +445,7 @@ struct amdgpu_device_new *adev_new
 struct amdgpu_ps_new *rps_new
 struct rv7xx_pl_new *pl_new
 struct amdgpu_device_new *adev_new
+struct rv7xx_pl_new *si_cpl1_new
 struct rv7xx_pl_new *si_cpl2_new
 struct si_ps_new *si_cps_new
 struct si_ps_new *si_rps_new

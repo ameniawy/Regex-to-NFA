@@ -12,7 +12,7 @@ if __name__ == '__main__':
 
     print(args.file)
 
-    regex = re.compile("struct [A-Za-z][A-Za-z0-9_]* [*][A-Za-z][A-Za-z0-9_]*")
+    regex = re.compile("struct [A-Za-z][A-Za-z0-9_]*[\s]*[*][\s]*[A-Za-z][A-Za-z0-9_]*")
 
     output_file = open("task_1_8_result.txt", "w+")
 
