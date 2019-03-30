@@ -3,7 +3,8 @@ import re
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(add_help=True, description='Sample Commandline')
+    parser = argparse.ArgumentParser(
+        add_help=True, description='Sample Commandline')
 
     parser.add_argument('--file', action="store", help="path of file to take as input", nargs="?",
                         metavar="file")
@@ -12,7 +13,7 @@ if __name__ == '__main__':
 
     print(args.file)
 
-    regex = re.compile("[^12+](?==)")
+    regex = re.compile("[^12+]+(?==)")
 
     output_file = open("task_1_6_result.txt", "w+")
 
@@ -21,4 +22,4 @@ if __name__ == '__main__':
             matches = regex.findall(line)
             if matches:
                 for match in matches:
-                    output_file.write(match + "\n")
+                    output_file.write(match[0] + "\n")

@@ -37,7 +37,7 @@ class Conversion:
     # A utility function to check is the given character 
     # is operand  
     def isOperand(self, ch): 
-        return ch.isalpha() or ch == ' '
+        return ch.isalpha() or ch == ' ' or ch.isdigit()
   
     # Check if the precedence of operator is strictly 
     # less than top of stack or not 

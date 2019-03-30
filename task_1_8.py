@@ -3,7 +3,8 @@ import re
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(add_help=True, description='Sample Commandline')
+    parser = argparse.ArgumentParser(
+        add_help=True, description='Sample Commandline')
 
     parser.add_argument('--file', action="store", help="path of file to take as input", nargs="?",
                         metavar="file")
@@ -12,7 +13,8 @@ if __name__ == '__main__':
 
     print(args.file)
 
-    regex = re.compile("struct [A-Za-z][A-Za-z0-9_]*[\s]*[*][\s]*[A-Za-z][A-Za-z0-9_]*")
+    regex = re.compile(
+        "struct [A-Za-z][A-Za-z0-9_]*[\s]*[*][\s]*[A-Za-z][A-Za-z0-9_]*")
 
     output_file = open("task_1_8_result.txt", "w+")
 

@@ -15,6 +15,7 @@ import argparse
 #     ]
 # }
 
+
 class NFA:
     def __init__(self, initial_state, final_states, states, transitions):
         self.initial_state = initial_state
@@ -24,7 +25,8 @@ class NFA:
         self.alphabets = []
 
     def add_transition(self, arc_from, arc_to, arc_condition):
-        similar = [(index, transition) for (index, transition) in enumerate(self.transitions) if transition['arc_from'] == arc_from and transition['arc_condition'] == arc_condition]
+        similar = [(index, transition) for (index, transition) in enumerate(self.transitions)
+                   if transition['arc_from'] == arc_from and transition['arc_condition'] == arc_condition]
 
         # based on the implementation length will always be either 1 or 0
         if len(similar) == 0:
@@ -54,18 +56,23 @@ class NFA:
         # print start state
         res = res + str(self.initial_state) + '\n'
         # print final state(s)
-        res = res + ','.join([str(state) for state in self.final_states]) + '\n'
+        res = res + ','.join([str(state)
+                              for state in self.final_states]) + '\n'
         # print transitions
-        res = res + ', '.join(['(' + str(transition['arc_from']) + ',' + str(transition['arc_condition']) + ',[' + ','.join([str(to) for to in transition['arc_to']]) + '])' for transition in self.transitions])
+        res = res + ', '.join(['(' + str(transition['arc_from']) + ',' + str(transition['arc_condition']) +
+                               ',[' + ','.join([str(to) for to in transition['arc_to']]) + '])' for transition in self.transitions])
         return res
 
+
 state_index = 0
+
 
 def _create_state():
     global state_index
     new_state = state_index
     state_index += 1
     return new_state
+
 
 def zero_or_more(nfa_1):
     """ Applies the kleene star operation on the input NFA and returns it.
@@ -93,8 +100,7 @@ def zero_or_more(nfa_1):
     nfa_1.states.append(new_final_state)
     for final_state in nfa_1.final_states:
         nfa_1.add_transition(final_state, new_final_state, ' ')
-        
-    
+
     nfa_1.final_states = [new_final_state]
 
     # 5 connect new start state to new acceptance state using epsilon transition
@@ -102,6 +108,7 @@ def zero_or_more(nfa_1):
 
     # 6 return updated NFA after applying kleene star
     return nfa_1
+
 
 def union(nfa_1, nfa_2):
     """ Creates a new NFA and applies union on input NFAs then return the new NFA.
@@ -115,7 +122,8 @@ def union(nfa_1, nfa_2):
 
     """
     # 1 create a new NFA with states and transitions from both NFAs
-    new_nfa = NFA(0,[], nfa_1.states + nfa_2.states, nfa_1.transitions + nfa_2.transitions)
+    new_nfa = NFA(0, [], nfa_1.states + nfa_2.states,
+                  nfa_1.transitions + nfa_2.transitions)
 
     # 2 create a new initial state and create epsilon transitions from it to
     # initial states of both NFAs and set it as initial state for new NFA
@@ -134,8 +142,12 @@ def union(nfa_1, nfa_2):
     for final_state in nfa_2.final_states:
         new_nfa.add_transition(final_state, new_final_state, ' ')
 
+    new_nfa.final_states = [new_final_state]
+    new_nfa.states += [new_initial_state, new_final_state]
+
     # 4 return new NFA
     return new_nfa
+
 
 def concat(nfa_1, nfa_2):
     """ Creates a new NFA and applies concat on input NFAs then return the new NFA.
@@ -158,23 +170,26 @@ def concat(nfa_1, nfa_2):
             if arc_to == removed_state:
                 nfa_1.transitions[idx1]['arc_to'][idx2] = nfa_2.initial_state
 
-
     # 1 create an epsilon transition between the final state(s) of nfa_1 to the initial_state of nfa_2
-    new_nfa = NFA(nfa_1.initial_state ,nfa_2.final_states, nfa_1.states + nfa_2.states, nfa_1.transitions + nfa_2.transitions)
+    new_nfa = NFA(nfa_1.initial_state, nfa_2.final_states, nfa_1.states +
+                  nfa_2.states, nfa_1.transitions + nfa_2.transitions)
 
     # for final_state in nfa_1.final_states:
     #     new_nfa.add_transition(final_state, nfa_2.initial_state, ' ')
 
     # 2 final state of nfa_2 is the final state of the concat res
     # new_nfa.final_states = nfa_2.final_states
-        
+
     return new_nfa
+
 
 def copy_NFA(nfa_1):
 
-    transitions =  [{'arc_from': transition['arc_from'], 'arc_to': transition['arc_to'].copy(), 'arc_condition': transition['arc_condition']} for transition in nfa_1.transitions]
+    transitions = [{'arc_from': transition['arc_from'], 'arc_to': transition['arc_to'].copy(
+    ), 'arc_condition': transition['arc_condition']} for transition in nfa_1.transitions]
 
-    new_nfa = NFA(nfa_1.initial_state, nfa_1.final_states.copy(), nfa_1.states.copy(), transitions)
+    new_nfa = NFA(nfa_1.initial_state, nfa_1.final_states.copy(),
+                  nfa_1.states.copy(), transitions)
 
     mapping = dict()
 
@@ -196,8 +211,8 @@ def copy_NFA(nfa_1):
         for index_2, arc_to_instance in enumerate(transition['arc_to']):
             new_nfa.transitions[index]['arc_to'][index_2] = mapping[arc_to_instance]
 
-
     return new_nfa
+
 
 def one_or_more(nfa_1):
     """ Returns the concat of nfa_1 and zero_or_more(nfa_!).
@@ -211,6 +226,7 @@ def one_or_more(nfa_1):
     """
     copied_nfa_1 = copy_NFA(nfa_1)
     return concat(nfa_1, zero_or_more(copied_nfa_1))
+
 
 def zero_or_one(nfa_1):
     """ Applies the zero or one operation on the input NFA and returns it.
@@ -238,8 +254,7 @@ def zero_or_one(nfa_1):
     nfa_1.states.append(new_final_state)
     for final_state in nfa_1.final_states:
         nfa_1.add_transition(final_state, new_final_state, ' ')
-        
-    
+
     nfa_1.final_states = [new_final_state]
 
     # 5 connect new start state to new acceptance state using epsilon transition
@@ -248,6 +263,7 @@ def zero_or_one(nfa_1):
     # 6 return updated NFA after applying kleene star
     return nfa_1
 
+
 def create_NFA_from_symbol(symbol):
     initial_state = _create_state()
     final_state = _create_state()
@@ -255,9 +271,10 @@ def create_NFA_from_symbol(symbol):
     nfa.add_transition(initial_state, final_state, symbol)
     return nfa
 
+
 def regex_postix_to_NFA(regex_postfix):
     operators = ['.', '*', '+', '?', '|']
-    
+
     stack = list()
 
     for char in regex_postfix:
@@ -278,7 +295,8 @@ def regex_postix_to_NFA(regex_postfix):
                 stack.append(one_or_more(op1))
             elif char == '?':
                 op1 = stack.pop()
-                stack.append(zero_or_one(op1))                
+                op2 = create_NFA_from_symbol(' ')
+                stack.append(union(op1, op2))
 
         else:
             nfa = create_NFA_from_symbol(char)
@@ -286,6 +304,7 @@ def regex_postix_to_NFA(regex_postfix):
             # stack
 
     return stack.pop()
+
 
 def regex_infix_to_postfix(regex):
     conversion = Conversion()
@@ -297,15 +316,17 @@ def regex_preprocess(regex):
     for (index, char) in enumerate(regex):
         if char == 'ε':
             res += ' '
-        elif index > 0 and (char.isalpha() or char == '(') and regex[index - 1] != '|' and regex[index - 1] != '(':
+        elif index > 0 and (char.isalpha() or char.isdigit() or char == '(') and regex[index - 1] != '|' and regex[index - 1] != '(':
             res += '.'
             res += char
         else:
             res += char
     return res
 
+
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(add_help=True, description='Sample Commandline')
+    parser = argparse.ArgumentParser(
+        add_help=True, description='Sample Commandline')
 
     parser.add_argument('--file', action="store", help="path of file to take as input", nargs="?",
                         metavar="file")
